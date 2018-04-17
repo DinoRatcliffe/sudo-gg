@@ -1,0 +1,27 @@
+pattern_1=(39 30 40 32)
+pattern_1_pos=0
+pattern_1_audio_file=$(dirname $0)/gg.mp3
+
+function test_pattern() {
+    declare -a pattern=("${!2}")
+    if [[ ${!1} == ${pattern[${!3}]} ]]; then
+        eval "$3=$((${!3} + 1))"
+
+        if [[ ${!3} -eq ${#pattern[@]} ]]; then
+            eval "$3=0"
+            mpv ${!4}
+        fi
+     else
+         eval "$3=0"
+    fi
+}
+
+
+xinput test $1 | \
+while read xout; do
+    if [[ $xout == *release* ]]; then 
+        xout=`echo $xout | sed 's/[^0-9]//g'`
+
+        test_pattern xout pattern_1[@] pattern_1_pos pattern_1_audio_file
+    fi
+done
